@@ -20,24 +20,8 @@ KTF.set_session(sess)
 # 	aug = []
 # 	aug.append(cv2.euqalizeHist(im))
 
-def linearMap(im):
-	xmax = float(np.max(im))
-	xmin = np.min(im)
-	im = (im-xmin)/(xmax-xmin)
-	return im
-
-train_datagen = ImageDataGenerator(rescale=1./255,
-	rotation_range=40,
-	width_shift_range=0.2,
-	height_shift_range=0.2, 
-	shear_range=0.2,
-	zoom_range=0.2,
-	horizontal_flip=True,
-	fill_mode='constant')
-test_datagen = ImageDataGenerator(rescale=1./255)
-
-label_path = "/home/boyun/Develop/DataSet/RAF/BasicEmotion/EmoLabel/list_patition_label.txt"
-img_path = "/home/boyun/Develop/DataSet/RAF/BasicEmotion/image/aligned/images"
+label_path = "/home/DataSet/RAF/BasicEmotion/EmoLabel/list_patition_label.txt"
+img_path = "/home/DataSet/RAF/BasicEmotion/image/aligned/images"
 
 x_train = []
 y_train = []
@@ -119,26 +103,7 @@ callback_lists=[checkpoint1,checkpoint2]
 model.compile(loss='categorical_crossentropy',optimizer="sgd",metrics=['accuracy'])
 hist = model.fit(x_train,y_train, batch_size=32, epochs=50,validation_data=(x_test,y_test), verbose=1, shuffle=True,callbacks=callback_lists)
 
-# train_generator = train_datagen.flow_from_directory('train', target_size=(100,100),
-# 	batch_size=32) 
-# validation_generator = test_datagen.flow_from_directory('test', 
-# 	target_size=(100,100), 
-# 	batch_size=32)
-
-
-
-#datagen = ImageDataGenerator(rotation_range=40, width_shift_range=0.2, height_shift_range=0.2, shear_range=0.2, zoom_range=0.2, horizontal_flip=True, fill_mode='constant') 
-#constant or nearst
-# img = load_img('aligned/train_04561_aligned.jpg') 
-# x = img_to_array(img) 
-# x = x.reshape((1,)+x.shape) 
-# i = 0 
-# for batch in datagen.flow(x, batch_size=1, save_to_dir='ag1/', save_prefix='test', save_format='jpg'): 
-# 	i += 1 
-# 	if i>60: 
-# 		break
-################################################################################
-
+###画ACC曲线部分########
 from matplotlib import pyplot as plt
 val_max_indx=np.argmax(hist.history['val_acc'])#max value index
 plt.plot(hist.history['acc'])
@@ -185,10 +150,8 @@ f.close()
 #################################
 
 
-#####predict#########
-label = {1: "Surprise",2: "Fear",3: "Disgust",4: "Happiness",5: "Sadness",6: "Anger",7: "Neutral"}
-
-test_path = "/home/boyun/Develop/DataSet/RAF/mytest"
+#####predict and draw the prob bar#########
+test_path = "/home/DataSet/RAF/mytest"
 fns = os.listdir(test_path)
 for fn in fns:
 	img = load_img(os.path.join(test_path,fn))
